@@ -13,10 +13,27 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var coreData = CoreDataStack()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        deleteRecord()
+        checkDataStore()
+
+        let managedObjectContext = coreData.persistentContainer.viewContext
+        let tabBarController = self.window?.rootViewController as! UITabBarController
+        
+        //First Tab
+        let homeListNavigationVC = tabBarController.viewControllers![0] as! UINavigationController
+        let homeListVC = homeListNavigationVC.topViewController as! HomeViewController
+        homeListVC.managedObjectContext = managedObjectContext
+        
+        // Second Tab - Summary View
+        let summaryNavigationController = tabBarController.viewControllers?[1] as! UINavigationController
+        let summaryViewController = summaryNavigationController.topViewController as! SummaryViewController
+        summaryViewController.managedObjectContext = managedObjectContext
+        
         return true
     }
 
@@ -41,53 +58,142 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
-        self.saveContext()
+        coreData.saveContext()
     }
-
-    // MARK: - Core Data stack
-
-    lazy var persistentContainer: NSPersistentContainer = {
-        /*
-         The persistent container for the application. This implementation
-         creates and returns a container, having loaded the store for the
-         application to it. This property is optional since there are legitimate
-         error conditions that could cause the creation of the store to fail.
-        */
-        let container = NSPersistentContainer(name: "CoreDataTutorial")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                 
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        return container
-    }()
-
-    // MARK: - Core Data Saving support
-
-    func saveContext () {
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+    
+    func checkDataStore() {
+        let request: NSFetchRequest<Home> = Home.fetchRequest()
+        
+        let moc = coreData.persistentContainer.viewContext
+        do{
+            let homeCount = try moc.count(for: request)
+            if homeCount == 0 {
+                uploadSampleData()
             }
         }
+        catch {
+            fatalError("Error in counting record")
+        }
     }
+    
+    func uploadSampleData() {
+        let url = Bundle.main.url(forResource: "homes", withExtension: "json")
+        let data = try? Data(contentsOf: url!)
+        
+        do {
+            let jsonResult = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
+            let jsonArray = jsonResult.value(forKey: "home") as! NSArray
+            
+//            let address = try JSONDecoder().decode(Address.self, from:response.data!)
+            saveData(array: jsonArray)
+        }
+        catch {
+            fatalError("Cannot upload sample data")
+        }
+    }
+    
+    func saveData(array:NSArray) {
+        let moc = coreData.persistentContainer.viewContext
+        for obj in array {
+            let homeData = obj as! [String:AnyObject]
+            
+            guard let city = homeData["city"] else {
+                return
+            }
+            
+            guard let price = homeData["price"] else {
+                return
+            }
+            
+            guard let bed = homeData["bed"] else {
+                return
+            }
+            
+            guard let bath = homeData["bath"] else {
+                return
+            }
+            
+            guard let sqft = homeData["sqft"] else {
+                return
+            }
+            
+            guard let currentImage = homeData["image"] else {
+                return
+            }
+            var image = UIImage(named: currentImage as! String)
+            
+            guard let homeCategory = homeData["category"] else {
+                return
+            }
+            let homeType = (homeCategory as! NSDictionary)["homeType"] as? String
+            
+            guard let homeStatus = homeData["status"] else {
+                return
+            }
+            let isForSale = (homeStatus as! NSDictionary)["isForSale"] as? Bool
+            
+            let home = homeType?.caseInsensitiveCompare("condo") == .orderedSame ? Condo(context: moc) : SingleFamily(context: moc)
+            home.city = city as! String
+            home.price = price as! Double
+            home.bed = bed.int16Value
+            home.bath = bath.int16Value
+            home.sqft = sqft.int16Value
+            home.image = NSData.init(data: UIImageJPEGRepresentation(image!, 1)!)
+            home.homeType = homeType
+            home.isForSale = isForSale!
+            
+            if let unitsPerBuilding = homeData["unitsPerBuilding"] {
+                (home as! Condo).unitsPerBuilding = unitsPerBuilding.int16Value
+            }
+            
+            if let lotSize = homeData["lotSize"] {
+                (home as! SingleFamily).lotSize = lotSize.int16Value
+            }
+            
+            if let saleHistoryArray = homeData["saleHistory"] {
+                let saleHistoryData = home.saleHistory?.mutableCopy() as! NSMutableSet
+                
+                for obj in saleHistoryArray as! NSArray{
+                    let saleDict = obj as! [String:AnyObject]
+                    
+                    let saleHistory = SaleHistory(context: moc)
+                
+                    saleHistory.soldPrice = saleDict["soldPrice"] as! Double
+                
+                    let soldDateString = saleDict["soldDate"] as! String
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd"
+                    let date = dateFormatter.date(from: soldDateString)
+                    saleHistory.soldDate = date
+                    // save sale history
+                    
+                    saleHistoryData.add(saleHistory)
+                    home.addToSaleHistory(saleHistoryData)
+                }
+            }
+        }
+        coreData.saveContext()
+    }
+    
+    func deleteRecord() {
+        let moc = coreData.persistentContainer.viewContext
+        
+        let homeRequest:NSFetchRequest<Home> = Home.fetchRequest()
+        let saleHistoryRequest:NSFetchRequest<SaleHistory> = SaleHistory.fetchRequest()
+      
+        var deleteRequest:NSBatchDeleteRequest
+        var deleteResult:NSPersistentStoreResult
 
+        do{
+            deleteRequest = NSBatchDeleteRequest(fetchRequest: homeRequest as! NSFetchRequest<NSFetchRequestResult>)
+            deleteResult = try moc.execute(deleteRequest)
+            
+            deleteRequest = NSBatchDeleteRequest(fetchRequest: saleHistoryRequest as! NSFetchRequest<NSFetchRequestResult>)
+            deleteResult = try moc.execute(deleteRequest)
+        }
+        catch {
+            fatalError("Failed removing existing records")
+        }
+    }
 }
 
