@@ -65,8 +65,10 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
             request?.sortDescriptors = sortDescriptor
         }
         
-        homes = home!.getHomeFromRequest(requestObj: request!, moc: managedObjectContext)
-        tableView.reloadData()
+        home!.getHomesByStatus(request: request!, moc: managedObjectContext, completionHandler: { [weak self] (homesByStatus) in
+            self?.homes = homesByStatus
+            self?.tableView.reloadData()
+        })
     }
     
     // MARK: Actions
