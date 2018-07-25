@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
+class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var segmentedControl: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
@@ -24,12 +24,20 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var selectedHome:Home? = nil
     var home:Home? = nil
     var isForSale:Bool = true
+    var sortDescriptor = [NSSortDescriptor]()
+    var searchPredicate: NSPredicate?
+    var request:NSFetchRequest<Home>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         self.tableView.tableFooterView = UIView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        request = Home.fetchRequest()
         loadData()
     }
 
@@ -41,7 +49,23 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // MARK: Private Function
     private func loadData() {
         homes.removeAll()
-        homes = home!.getHomeByStatus(isForSale: isForSale, moc: managedObjectContext)
+        
+        var predicates = [NSPredicate]()
+        let statusPredicate = NSPredicate(format: "isForSale == %@", NSNumber(value: isForSale))
+        predicates.append(statusPredicate)
+        
+        if let additionalPredicate = searchPredicate {
+            predicates.append(additionalPredicate)
+        }
+        
+        let predicate = NSCompoundPredicate(type: NSCompoundPredicate.LogicalType.and, subpredicates:predicates)
+        request?.predicate = predicate
+        
+        if sortDescriptor.count > 0 {
+            request?.sortDescriptors = sortDescriptor
+        }
+        
+        homes = home!.getHomeFromRequest(requestObj: request!, moc: managedObjectContext)
         tableView.reloadData()
     }
     
@@ -92,7 +116,24 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
             let destinationVC = segue.destination as! SaleHistoryViewController
             destinationVC.home = selectedHome
             destinationVC.manageObjectContext = managedObjectContext
+        } else if segue.identifier == "filterSeg" {
+            sortDescriptor = []
+            searchPredicate = nil
+            
+            let destinationVC = segue.destination as! FilterTableViewController
+            destinationVC.delegate = self
         }
     }
     
+}
+
+extension HomeViewController:FilterTableViewControllerDelegate {
+    func updatehomeList(filterBy: NSPredicate?, sortBy: NSSortDescriptor?) {
+        if let filter = filterBy {
+            searchPredicate = filter
+        }
+        if let sort = sortBy {
+            sortDescriptor.append(sort)
+        }
+    }
 }

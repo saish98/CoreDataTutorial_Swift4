@@ -24,4 +24,14 @@ public class Home: NSManagedObject {
             fatalError("Error in getting list of homes")
         }
     }
+    
+    func getHomeFromRequest(requestObj:NSFetchRequest<Home>, moc: NSManagedObjectContext) -> [Home] {
+        do {
+            let homes = try moc.fetch(requestObj)
+            return homes
+        }
+        catch {
+            fatalError("Error in getting list of homes")
+        }
+    }
 }
