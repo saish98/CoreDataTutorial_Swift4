@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -204,6 +205,7 @@
                                             <outlet property="labelCity" destination="HAo-hM-fys" id="Ods-j5-ydv"/>
                                             <outlet property="labelPrice" destination="uSk-Ig-Ltw" id="wi9-fi-49p"/>
                                             <outlet property="labelSqft" destination="xHy-cZ-P7g" id="2Gl-Qm-Vaa"/>
+                                            <segue destination="25Y-hs-qyJ" kind="show" identifier="historySeg" id="D2v-8x-qTe"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -227,7 +229,7 @@
                     <navigationItem key="navigationItem" title="Home List" id="TMD-ei-Cf0">
                         <barButtonItem key="rightBarButtonItem" title="Filter" id="46Z-ml-M9I">
                             <connections>
-                                <segue destination="Uxu-CA-acV" kind="show" id="gf6-Ou-5H3"/>
+                                <segue destination="Uxu-CA-acV" kind="show" identifier="filterSeg" id="4D7-nF-KnO"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -239,6 +241,83 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GPw-X4-jOS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="972" y="-334.18290854572717"/>
+        </scene>
+        <!--Sale History-->
+        <scene sceneID="EXN-Hy-iIo">
+            <objects>
+                <viewController title="Sale History" id="25Y-hs-qyJ" customClass="SaleHistoryViewController" customModule="CoreDataTutorial" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="YXa-5D-wbz"/>
+                        <viewControllerLayoutGuide type="bottom" id="EB4-Zt-ZKQ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="GVi-Mj-KaE">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BbX-Fq-Ix7">
+                                <rect key="frame" x="26" y="74" width="323" height="220"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="220" id="2x0-Am-4q4"/>
+                                </constraints>
+                            </imageView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="5rc-gw-j8b">
+                                <rect key="frame" x="0.0" y="304" width="375" height="314"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="historyCellId" textLabel="Lmj-5Z-9CR" detailTextLabel="MPs-MQ-hPc" style="IBUITableViewCellStyleValue1" id="ADI-4U-ZNa" customClass="HistoryCell" customModule="CoreDataTutorial" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ADI-4U-ZNa" id="OmH-wR-Kh5">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Lmj-5Z-9CR">
+                                                    <rect key="frame" x="15" y="12" width="33.5" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="MPs-MQ-hPc">
+                                                    <rect key="frame" x="316" y="12" width="44" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="soldDateLabel" destination="Lmj-5Z-9CR" id="LKH-eN-l2p"/>
+                                            <outlet property="soldPriceLabel" destination="MPs-MQ-hPc" id="oPM-Ul-jd6"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="25Y-hs-qyJ" id="S6t-Rd-vCT"/>
+                                    <outlet property="delegate" destination="25Y-hs-qyJ" id="T9X-zU-S2s"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="5rc-gw-j8b" firstAttribute="leading" secondItem="GVi-Mj-KaE" secondAttribute="leading" id="Cb6-QN-BYw"/>
+                            <constraint firstItem="5rc-gw-j8b" firstAttribute="top" secondItem="BbX-Fq-Ix7" secondAttribute="bottom" constant="10" id="DiK-y8-xMK"/>
+                            <constraint firstItem="EB4-Zt-ZKQ" firstAttribute="top" secondItem="5rc-gw-j8b" secondAttribute="bottom" id="Ib5-ZR-JN3"/>
+                            <constraint firstItem="BbX-Fq-Ix7" firstAttribute="top" secondItem="YXa-5D-wbz" secondAttribute="bottom" constant="10" id="PLG-UL-qke"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="BbX-Fq-Ix7" secondAttribute="trailing" constant="10" id="U6h-Tf-EfO"/>
+                            <constraint firstAttribute="trailing" secondItem="5rc-gw-j8b" secondAttribute="trailing" id="mJu-AZ-juL"/>
+                            <constraint firstItem="BbX-Fq-Ix7" firstAttribute="leading" secondItem="GVi-Mj-KaE" secondAttribute="leadingMargin" constant="10" id="z8B-on-IGA"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="imageViewHome" destination="BbX-Fq-Ix7" id="F5c-er-3ZR"/>
+                        <outlet property="tableView" destination="5rc-gw-j8b" id="63i-qC-LGr"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lnk-wL-Y72" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1703" y="-453"/>
         </scene>
         <!--Filter Table View Controller-->
         <scene sceneID="XRc-tf-WUO">

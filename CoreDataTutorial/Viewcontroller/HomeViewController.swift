@@ -21,6 +21,7 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     lazy var homes = [Home]()
+    var selectedHome:Home? = nil
     var home:Home? = nil
     var isForSale:Bool = true
     
@@ -61,9 +62,9 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-    }
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        tableView.deselectRow(at: indexPath, animated: true)
+//    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -77,14 +78,21 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return 70
     }
     
-    /*
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "historySeg" {
+            let selectedIndexPath = tableView.indexPathForSelectedRow
+            selectedHome = homes[(selectedIndexPath?.row)!]
+            
+            let destinationVC = segue.destination as! SaleHistoryViewController
+            destinationVC.home = selectedHome
+            destinationVC.manageObjectContext = managedObjectContext
+        }
     }
-    */
-
+    
 }
