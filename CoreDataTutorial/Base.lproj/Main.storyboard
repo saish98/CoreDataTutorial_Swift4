@@ -13,7 +13,7 @@
         <!--Sold Homes-->
         <scene sceneID="NuW-uy-VyQ">
             <objects>
-                <tableViewController id="o57-Oq-xHV" sceneMemberID="viewController">
+                <tableViewController id="o57-Oq-xHV" customClass="SummaryTableViewController" customModule="CoreDataTutorial" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="WnC-pR-yKg">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -206,6 +206,15 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Sold Homes" id="hXZ-zp-o3L"/>
+                    <connections>
+                        <outlet property="avgPriceCondoLabel" destination="lwT-8M-JAD" id="ICV-oE-KjP"/>
+                        <outlet property="avgPriceSFLabel" destination="6xv-LV-wgi" id="kie-et-QPX"/>
+                        <outlet property="maxPriceHomeLabel" destination="UJa-bc-bj3" id="pS3-Mk-hpm"/>
+                        <outlet property="minPriceHomeLabel" destination="sZm-w9-3a5" id="0sN-2c-Uje"/>
+                        <outlet property="numCondoSoldLabel" destination="ebA-74-O3r" id="8sW-vF-nYa"/>
+                        <outlet property="numSFSoldLabel" destination="YUT-Hk-zPo" id="SNu-cd-tqS"/>
+                        <outlet property="totalSalesDollarLabel" destination="8iU-EG-BsS" id="FBk-xA-0gX"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7Au-kF-OXX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

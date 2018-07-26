@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Second Tab - Summary View
         let summaryNavigationController = tabBarController.viewControllers?[1] as! UINavigationController
-        let summaryViewController = summaryNavigationController.topViewController as! SummaryViewController
+        let summaryViewController = summaryNavigationController.topViewController as! SummaryTableViewController
         summaryViewController.managedObjectContext = managedObjectContext
         
         return true
